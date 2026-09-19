@@ -33,6 +33,7 @@ $equipamentos = $conn->query("
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Equipamentos</title>
+    <link rel="icon" href="assets/logo-icone.png">
     <link rel="stylesheet" href="estilo.css">
 </head>
 <body>

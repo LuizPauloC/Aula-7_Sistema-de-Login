@@ -180,7 +180,7 @@ aula7-login/
 ├── estilo.css                # Estilo de todas as páginas
 ├── script.js                 # Mostrar/esconder senha
 ├── index.php                 # Menu inicial
-├── assets/                   # Ícones de olho aberto e fechado
+├── assets/                   # Logo, ícone do site e os olhos de mostrar senha
 │
 │   # --- Autenticação ---
 ├── register.php              # Formulário de cadastro

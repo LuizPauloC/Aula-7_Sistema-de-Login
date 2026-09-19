@@ -3,10 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Aula 7 - Autenticação e Sessões</title>
+    <title>InfraRede UNESC - Bloco B</title>
+    <link rel="icon" href="assets/logo-icone.png">
     <link rel="stylesheet" href="estilo.css">
 </head>
 <body>
+    <div class="topo-logo">
+        <img src="assets/logo-completa.jpg" alt="InfraRede UNESC — Bloco B, Gerenciamento de Racks">
+    </div>
+
     <div class="caixa">
         <h1>Aula 7 - Sistema de Login</h1>
         <ol>

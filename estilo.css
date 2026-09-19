@@ -117,6 +117,33 @@ td select, td button {
     max-width: 1000px;
 }
 
+.topo-logo {
+    text-align: center;
+    margin-bottom: 18px;
+}
+
+.topo-logo img {
+    width: 200px;
+    max-width: 70%;
+    height: auto;
+    border-radius: 8px;
+}
+
+.menu-logo {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: bold;
+    color: #2e6da4;
+    padding-right: 14px;
+    border-right: 1px solid #ccc;
+}
+
+.menu-logo img {
+    width: 26px;
+    height: 26px;
+}
+
 .menu {
     display: flex;
     flex-wrap: wrap;

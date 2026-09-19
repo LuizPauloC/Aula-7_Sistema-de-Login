@@ -1,4 +1,8 @@
 <nav class="menu">
+    <span class="menu-logo">
+        <img src="assets/logo-icone.png" alt="">
+        InfraRede UNESC
+    </span>
     <a href="painel.php">Painel</a>
     <a href="racks.php">Racks</a>
     <a href="equipamentos.php">Equipamentos</a>
