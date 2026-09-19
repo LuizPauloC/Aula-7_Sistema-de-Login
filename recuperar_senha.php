@@ -14,7 +14,7 @@ unset($_SESSION['old']);
 </head>
 <body>
     <div class="topo-logo">
-        <img src="assets/logo-completa.jpg" alt="InfraRede UNESC — Bloco B, Gerenciamento de Racks">
+        <img src="assets/logo-completa.png" alt="InfraRede UNESC — Bloco B, Gerenciamento de Racks">
     </div>
 
     <div class="caixa">
