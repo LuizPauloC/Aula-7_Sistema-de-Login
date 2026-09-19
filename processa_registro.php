@@ -1,10 +1,13 @@
 <?php
 include 'conexao.php';
+session_start();
 
 $nome = trim($_POST['nome'] ?? '');
 $email = trim($_POST['email'] ?? '');
 $senha = $_POST['senha'] ?? '';
 $confirmar = $_POST['confirmar'] ?? '';
+
+$_SESSION['old'] = ['nome' => $nome, 'email' => $email];
 
 if ($nome === '' || $email === '' || $senha === '') {
     header("Location: register.php?erro=" . urlencode("Preencha todos os campos."));
@@ -31,6 +34,7 @@ $stmt->bind_param("ssss", $nome, $email, $senha_hash, $tipo);
 
 try {
     $stmt->execute();
+    unset($_SESSION['old']);
     header("Location: login.php?sucesso=" . urlencode("Cadastro realizado! Faça o login."));
 } catch (mysqli_sql_exception $e) {
     if ($e->getCode() === 1062) {

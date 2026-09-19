@@ -5,6 +5,8 @@ session_start();
 $email = trim($_POST['email'] ?? '');
 $senha = $_POST['senha'] ?? '';
 
+$_SESSION['old'] = ['email' => $email];
+
 $stmt = $conn->prepare("SELECT id, nome, senha FROM usuarios WHERE email = ?");
 $stmt->bind_param("s", $email);
 $stmt->execute();
@@ -13,6 +15,7 @@ $stmt->close();
 $conn->close();
 
 if ($usuario && password_verify($senha, $usuario['senha'])) {
+    unset($_SESSION['old']);
     $_SESSION['usuario_id'] = $usuario['id'];
     $_SESSION['usuario'] = $usuario['nome'];
     header("Location: painel.php");

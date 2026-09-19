@@ -1,3 +1,8 @@
+<?php
+session_start();
+$old = $_SESSION['old'] ?? [];
+unset($_SESSION['old']);
+?>
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
@@ -20,10 +25,15 @@
 
         <form action="processa_login.php" method="POST">
             <label>Email:</label>
-            <input type="email" name="email" required>
+            <input type="email" name="email" value="<?php echo htmlspecialchars($old['email'] ?? ''); ?>" required>
 
-            <label>Senha:</label>
-            <input type="password" name="senha" required>
+            <label for="senha">Senha:</label>
+            <div class="campo-senha">
+                <input type="password" name="senha" id="senha" required>
+                <button type="button" class="olho" data-alvo="senha" title="Mostrar senha">
+                    <img src="assets/olho-fechado.png" alt="Mostrar senha">
+                </button>
+            </div>
 
             <button type="submit">Entrar</button>
         </form>
@@ -31,5 +41,7 @@
         <p><a href="register.php">Criar uma conta</a></p>
         <p><a href="recuperar_senha.php">Esqueci minha senha</a></p>
     </div>
+
+    <script src="script.js"></script>
 </body>
 </html>

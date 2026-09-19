@@ -1,3 +1,8 @@
+<?php
+session_start();
+$old = $_SESSION['old'] ?? [];
+unset($_SESSION['old']);
+?>
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
@@ -16,21 +21,33 @@
 
         <form action="processa_registro.php" method="POST">
             <label>Nome:</label>
-            <input type="text" name="nome" required>
+            <input type="text" name="nome" value="<?php echo htmlspecialchars($old['nome'] ?? ''); ?>" required>
 
             <label>Email:</label>
-            <input type="email" name="email" required>
+            <input type="email" name="email" value="<?php echo htmlspecialchars($old['email'] ?? ''); ?>" required>
 
-            <label>Senha:</label>
-            <input type="password" name="senha" required>
+            <label for="senha">Senha:</label>
+            <div class="campo-senha">
+                <input type="password" name="senha" id="senha" required>
+                <button type="button" class="olho" data-alvo="senha" title="Mostrar senha">
+                    <img src="assets/olho-fechado.png" alt="Mostrar senha">
+                </button>
+            </div>
 
-            <label>Confirmar senha:</label>
-            <input type="password" name="confirmar" required>
+            <label for="confirmar">Confirmar senha:</label>
+            <div class="campo-senha">
+                <input type="password" name="confirmar" id="confirmar" required>
+                <button type="button" class="olho" data-alvo="confirmar" title="Mostrar senha">
+                    <img src="assets/olho-fechado.png" alt="Mostrar senha">
+                </button>
+            </div>
 
             <button type="submit">Cadastrar</button>
         </form>
 
         <p><a href="login.php">Já tenho uma conta</a></p>
     </div>
+
+    <script src="script.js"></script>
 </body>
 </html>

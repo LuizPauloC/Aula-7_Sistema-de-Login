@@ -1,21 +1,7 @@
 <?php
-session_start();
-if (!isset($_SESSION['usuario_id'])) {
-    header("Location: login.php");
-    exit();
-}
+include 'verifica_login.php';
 
-include 'conexao.php';
-
-$id_logado = $_SESSION['usuario_id'];
-
-$stmt = $conn->prepare("SELECT tipo FROM usuarios WHERE id = ?");
-$stmt->bind_param("i", $id_logado);
-$stmt->execute();
-$logado = $stmt->get_result()->fetch_assoc();
-$stmt->close();
-
-if ($logado['tipo'] !== 'creator' && $logado['tipo'] !== 'admin') {
+if (!$pode_editar) {
     header("Location: painel.php?erro=" . urlencode("Você não tem permissão para alterar tipos."));
     exit();
 }

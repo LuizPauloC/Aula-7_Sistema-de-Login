@@ -1,9 +1,12 @@
 <?php
 include 'conexao.php';
+session_start();
 
 $email = trim($_POST['email'] ?? '');
 $senha = $_POST['senha'] ?? '';
 $confirmar = $_POST['confirmar'] ?? '';
+
+$_SESSION['old'] = ['email' => $email];
 
 if ($senha !== $confirmar) {
     header("Location: recuperar_senha.php?erro=" . urlencode("As senhas não são iguais."));
@@ -34,5 +37,6 @@ $stmt->execute();
 $stmt->close();
 $conn->close();
 
+unset($_SESSION['old']);
 header("Location: login.php?sucesso=" . urlencode("Senha alterada! Faça o login."));
 exit();

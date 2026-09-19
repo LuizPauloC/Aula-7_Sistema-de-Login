@@ -1,25 +1,17 @@
 <?php
-session_start();
-if (!isset($_SESSION['usuario_id'])) {
-    header("Location: login.php");
-    exit();
-}
+include 'verifica_login.php';
 
-include 'conexao.php';
-
-$id_logado = $_SESSION['usuario_id'];
-
-$stmt = $conn->prepare("SELECT nome, tipo FROM usuarios WHERE id = ?");
-$stmt->bind_param("i", $id_logado);
-$stmt->execute();
-$logado = $stmt->get_result()->fetch_assoc();
-$stmt->close();
-
-$pode_gerenciar = ($logado['tipo'] === 'creator' || $logado['tipo'] === 'admin');
-
-if ($pode_gerenciar) {
+if ($pode_editar) {
     $usuarios = $conn->query("SELECT id, nome, email, tipo FROM usuarios ORDER BY id");
 }
+
+$resumo = $conn->query("
+    SELECT
+        (SELECT COUNT(*) FROM racks) AS racks,
+        (SELECT COUNT(*) FROM equipamentos_rack) AS equipamentos,
+        (SELECT COUNT(*) FROM ambientes) AS ambientes,
+        (SELECT COUNT(*) FROM manutencoes) AS manutencoes
+")->fetch_assoc();
 ?>
 <!DOCTYPE html>
 <html lang="pt-br">
@@ -30,7 +22,9 @@ if ($pode_gerenciar) {
     <link rel="stylesheet" href="estilo.css">
 </head>
 <body>
-    <div class="caixa">
+    <div class="caixa caixa-larga">
+        <?php include 'menu.php'; ?>
+
         <h1>Bem-vindo, <?php echo htmlspecialchars($logado['nome']); ?>!</h1>
         <p>Seu tipo de usuário: <strong><?php echo $logado['tipo']; ?></strong></p>
 
@@ -42,45 +36,63 @@ if ($pode_gerenciar) {
             <p class="sucesso"><?php echo htmlspecialchars($_GET['sucesso']); ?></p>
         <?php endif; ?>
 
-        <?php if ($pode_gerenciar): ?>
-            <h2>Gerenciar usuários</h2>
+        <h2>Infraestrutura do Bloco B</h2>
+        <div class="tabela-scroll">
             <table>
                 <tr>
-                    <th>Nome</th>
-                    <th>Email</th>
-                    <th>Tipo</th>
-                    <th>Alterar tipo</th>
+                    <th>Ambientes</th>
+                    <th>Racks</th>
+                    <th>Equipamentos</th>
+                    <th>Manutenções</th>
                 </tr>
-                <?php while ($u = $usuarios->fetch_assoc()): ?>
-                    <tr>
-                        <td>
-                            <?php echo htmlspecialchars($u['nome']); ?>
-                            <?php if ($u['id'] == $id_logado) echo ' (você)'; ?>
-                        </td>
-                        <td><?php echo htmlspecialchars($u['email']); ?></td>
-                        <td><?php echo $u['tipo']; ?></td>
-                        <td>
-                            <?php if ($u['tipo'] === 'creator'): ?>
-                                O creator não pode ser alterado
-                            <?php else: ?>
-                                <form action="processa_tipo.php" method="POST">
-                                    <input type="hidden" name="id" value="<?php echo $u['id']; ?>">
-                                    <select name="tipo">
-                                        <option value="admin" <?php if ($u['tipo'] === 'admin') echo 'selected'; ?>>admin</option>
-                                        <option value="guest" <?php if ($u['tipo'] === 'guest') echo 'selected'; ?>>guest</option>
-                                    </select>
-                                    <button type="submit">Salvar</button>
-                                </form>
-                            <?php endif; ?>
-                        </td>
-                    </tr>
-                <?php endwhile; ?>
+                <tr>
+                    <td><?php echo $resumo['ambientes']; ?></td>
+                    <td><?php echo $resumo['racks']; ?></td>
+                    <td><?php echo $resumo['equipamentos']; ?></td>
+                    <td><?php echo $resumo['manutencoes']; ?></td>
+                </tr>
             </table>
-        <?php else: ?>
-            <p>Você está logado como <strong>guest</strong> e não pode gerenciar usuários.</p>
-        <?php endif; ?>
+        </div>
 
-        <p><a href="logout.php">Sair</a></p>
+        <?php if ($pode_editar): ?>
+            <h2>Gerenciar usuários</h2>
+            <div class="tabela-scroll">
+                <table>
+                    <tr>
+                        <th>Nome</th>
+                        <th>Email</th>
+                        <th>Tipo</th>
+                        <th>Alterar tipo</th>
+                    </tr>
+                    <?php while ($u = $usuarios->fetch_assoc()): ?>
+                        <tr>
+                            <td>
+                                <?php echo htmlspecialchars($u['nome']); ?>
+                                <?php if ($u['id'] == $id_logado) echo ' (você)'; ?>
+                            </td>
+                            <td><?php echo htmlspecialchars($u['email']); ?></td>
+                            <td><?php echo $u['tipo']; ?></td>
+                            <td>
+                                <?php if ($u['tipo'] === 'creator'): ?>
+                                    <span class="vazio">O creator não pode ser alterado</span>
+                                <?php else: ?>
+                                    <form action="processa_tipo.php" method="POST">
+                                        <input type="hidden" name="id" value="<?php echo $u['id']; ?>">
+                                        <select name="tipo">
+                                            <option value="admin" <?php if ($u['tipo'] === 'admin') echo 'selected'; ?>>admin</option>
+                                            <option value="guest" <?php if ($u['tipo'] === 'guest') echo 'selected'; ?>>guest</option>
+                                        </select>
+                                        <button type="submit" class="btn-pequeno">Salvar</button>
+                                    </form>
+                                <?php endif; ?>
+                            </td>
+                        </tr>
+                    <?php endwhile; ?>
+                </table>
+            </div>
+        <?php else: ?>
+            <p>Você está logado como <strong>guest</strong>: pode consultar os dados da infraestrutura, mas não pode alterar nada nem gerenciar usuários.</p>
+        <?php endif; ?>
     </div>
 </body>
 </html>

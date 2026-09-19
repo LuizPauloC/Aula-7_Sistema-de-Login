@@ -1,10 +1,15 @@
-# Sistema de Login em PHP — Aula 7
+# Gestão de Racks do Bloco B com Sistema de Login — PHP
 
-Sistema de autenticação e gerenciamento de sessões desenvolvido para a disciplina de
-**Desenvolvimento Back-End** (Aula 7 — Autenticação e Sessões no PHP).
+Sistema desenvolvido para a disciplina de **Desenvolvimento Back-End**, unindo os dois
+trabalhos da matéria:
 
-O sistema tem cadastro de usuários, login com sessão, página restrita, recuperação de senha
-e três níveis de permissão (**creator**, **admin** e **guest**) gerenciados dentro do painel.
+- **1ª avaliação** — modelagem do banco de dados de gestão da infraestrutura de racks de
+  rede do Bloco B da UNESC (7 tabelas em 3ª Forma Normal);
+- **Aula 7** — autenticação e gerenciamento de sessões em PHP.
+
+O resultado é uma aplicação onde o banco de racks só é acessível depois do login, e o que
+cada pessoa pode fazer com os dados depende do seu nível de permissão (**creator**,
+**admin** ou **guest**).
 
 ---
 
@@ -55,20 +60,29 @@ uma das opções abaixo.
 **Pelo terminal:**
 
 ```bash
-mysql -u root -p < sistema_login.sql
+mysql -u root -p --default-character-set=utf8mb4 < sistema_login.sql
 ```
 
-Isso cria o banco `sistema_login` e a tabela `usuarios`:
+> O `--default-character-set=utf8mb4` é **obrigatório** no Windows. Sem ele o cliente lê o
+> arquivo usando a codificação do console e os acentos entram errados no banco
+> ("Laboratório" vira "Laborat├│rio").
 
-```sql
-CREATE TABLE usuarios (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    nome VARCHAR(100) NOT NULL,
-    email VARCHAR(100) UNIQUE NOT NULL,
-    senha VARCHAR(255) NOT NULL,
-    tipo ENUM('creator', 'admin', 'guest') NOT NULL DEFAULT 'guest'
-);
-```
+O script cria o banco `sistema_login` com **8 tabelas**: a de autenticação e as 7 do
+trabalho de modelagem.
+
+| Tabela | Função |
+|---|---|
+| `usuarios` | Contas de acesso com nome, email, senha em hash e tipo |
+| `ambientes` | Espaços físicos do Bloco B (sala, corredor, laboratório) |
+| `racks` | Gabinetes instalados, ligados a um ambiente |
+| `categorias_equipamento` | Catálogo de tipos (switch, roteador, patch panel) |
+| `fabricantes` | Marcas e contatos de suporte |
+| `equipamentos_rack` | Dispositivos dentro de cada rack |
+| `tecnicos` | Equipe de TI responsável pelas manutenções |
+| `manutencoes` | Histórico de intervenções feitas nos racks |
+
+As 7 tabelas de racks vêm com dados de exemplo já cadastrados. Rode o script **apenas uma
+vez**, senão os dados de exemplo serão inseridos novamente.
 
 ### 3. Configurar a conexão
 
@@ -115,30 +129,44 @@ Acesse `register.php` e cadastre-se normalmente.
 ## Como usar
 
 1. **Cadastro** (`register.php`) — nome, email e senha (mínimo 6 caracteres, com confirmação)
-2. **Login** (`login.php`) — abre a sessão e redireciona para o painel
-3. **Painel** (`painel.php`) — área restrita; creator e admin veem a lista de usuários e podem alterar os tipos
-4. **Recuperar senha** (`recuperar_senha.php`) — informa o email e define a nova senha
-5. **Sair** (`logout.php`) — destrói a sessão
+2. **Login** (`login.php`) — abre a sessão e leva ao painel
+3. **Painel** (`painel.php`) — resumo da infraestrutura e, para creator/admin, gerenciamento de usuários
+4. **Racks, Equipamentos e Manutenções** — consulta para todos; cadastro, edição e exclusão para creator/admin
+5. **Cadastros** (`cadastros.php`) — consulta das tabelas de apoio (ambientes, categorias, fabricantes, técnicos)
+6. **Recuperar senha** (`recuperar_senha.php`) — informa o email e define a nova senha
+7. **Sair** (`logout.php`) — destrói a sessão
+
+Nos campos de senha há um ícone de olho que mostra ou esconde o que foi digitado. Quando
+um formulário é recusado, nome e email voltam preenchidos; a senha, por segurança, é
+sempre redigitada.
 
 ### Tipos de usuário
 
-| Tipo | Acessa o painel | Gerencia usuários | Pode ser rebaixado |
-|---|---|---|---|
-| `creator` | Sim | Sim | **Não** — o cargo é permanente |
-| `admin` | Sim | Sim, inclusive outros admins | Sim |
-| `guest` | Sim (só a tela de boas-vindas) | Não | — |
+| Tipo | Consulta os dados | Cadastra / edita / exclui | Gerencia usuários | Pode ser rebaixado |
+|---|---|---|---|---|
+| `creator` | Sim | Sim | Sim | **Não** — o cargo é permanente |
+| `admin` | Sim | Sim | Sim, inclusive outros admins | Sim |
+| `guest` | Sim | Não | Não | — |
 
-Regras aplicadas pelo servidor em `processa_tipo.php`:
+Regras aplicadas **pelo servidor**:
 
 - O `creator` **não pode** ter o tipo alterado por ninguém
 - Um `admin` **pode** alterar o tipo de outro `admin`
-- Um `guest` não pode alterar tipo nenhum, nem o próprio
+- Um `guest` consulta tudo, mas não altera nada
 - Ninguém pode ser promovido a `creator` — o cargo só existe no primeiro cadastro
 - Quem não está logado é redirecionado para o login
 
-As validações rodam no PHP, não apenas na interface: mesmo enviando uma requisição
-direto para `processa_tipo.php` (por `curl` ou Postman, sem passar pela tela), as regras
-continuam valendo.
+As validações não estão apenas na interface: mesmo enviando uma requisição direto para
+os arquivos `processa_*.php` (por `curl` ou Postman, sem passar pela tela), as regras
+continuam valendo. O arquivo `verifica_login.php` é incluído no topo de toda página
+restrita e busca o tipo do usuário **no banco**, não na sessão — assim, se um admin for
+rebaixado, ele perde o acesso na hora, sem esperar o logout.
+
+### Integridade referencial
+
+As chaves estrangeiras impedem apagar um registro que ainda tem dependentes. Ao tentar
+excluir um rack que possui equipamentos ou manutenções, o sistema mostra uma mensagem
+explicando o motivo em vez de quebrar.
 
 ---
 
@@ -147,23 +175,35 @@ continuam valendo.
 ```
 aula7-login/
 ├── conexao.php               # Conexão com o MySQL (ajuste as credenciais aqui)
-├── sistema_login.sql         # Script de criação do banco e da tabela
+├── sistema_login.sql         # Script de criação do banco e das 8 tabelas
 ├── estilo.css                # Estilo de todas as páginas
+├── script.js                 # Mostrar/esconder senha
 ├── index.php                 # Menu inicial
+├── assets/                   # Ícones de olho aberto e fechado
 │
+│   # --- Autenticação ---
 ├── register.php              # Formulário de cadastro
 ├── processa_registro.php     # Valida, define o tipo e grava o usuário
-│
 ├── login.php                 # Formulário de login
 ├── processa_login.php        # Confere a senha e abre a sessão
-│
-├── painel.php                # Página restrita + gerenciamento de usuários
-├── processa_tipo.php         # Aplica as regras de permissão e altera o tipo
-│
 ├── recuperar_senha.php       # Formulário de nova senha
 ├── processa_recuperacao.php  # Valida e regrava a senha
+├── logout.php                # Destrói a sessão
 │
-└── logout.php                # Destrói a sessão
+│   # --- Compartilhados pelas páginas restritas ---
+├── verifica_login.php        # Exige login e descobre o tipo do usuário
+├── menu.php                  # Barra de navegação
+│
+│   # --- Painel e gestão de racks ---
+├── painel.php                # Resumo da infraestrutura + gerenciamento de usuários
+├── processa_tipo.php         # Aplica as regras e altera o tipo de um usuário
+├── racks.php                 # Lista e formulário de racks
+├── processa_racks.php        # Cadastra, edita e exclui racks
+├── equipamentos.php          # Lista e formulário de equipamentos
+├── processa_equipamentos.php # Cadastra, edita e exclui equipamentos
+├── manutencoes.php           # Lista e formulário de manutenções
+├── processa_manutencoes.php  # Cadastra, edita e exclui manutenções
+└── cadastros.php             # Consulta das tabelas de apoio
 ```
 
 Os arquivos vêm em pares: uma **página** mostra o formulário, e um **processador**

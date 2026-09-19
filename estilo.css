@@ -25,13 +25,19 @@ label {
     font-weight: bold;
 }
 
-input, select {
+input, select, textarea {
     width: 100%;
     padding: 8px;
     margin-top: 4px;
     border: 1px solid #ccc;
     border-radius: 4px;
     box-sizing: border-box;
+}
+
+textarea {
+    font-family: inherit;
+    font-size: inherit;
+    min-height: 70px;
 }
 
 button {
@@ -46,6 +52,39 @@ button {
 
 button:hover {
     background: #24587f;
+}
+
+.campo-senha {
+    position: relative;
+    margin-top: 4px;
+}
+
+.campo-senha input {
+    margin-top: 0;
+    padding-right: 52px;
+}
+
+.olho {
+    position: absolute;
+    right: 6px;
+    top: 50%;
+    transform: translateY(-50%);
+    margin: 0;
+    padding: 3px;
+    background: none;
+    border: none;
+    line-height: 0;
+    border-radius: 3px;
+}
+
+.olho:hover {
+    background: #eee;
+}
+
+.olho img {
+    display: block;
+    width: 34px;
+    height: auto;
 }
 
 table {
@@ -72,6 +111,58 @@ td form {
 td select, td button {
     width: auto;
     margin-top: 0;
+}
+
+.caixa-larga {
+    max-width: 1000px;
+}
+
+.menu {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 14px;
+    align-items: center;
+    padding-bottom: 12px;
+    margin-bottom: 20px;
+    border-bottom: 1px solid #ccc;
+}
+
+.menu a {
+    color: #2e6da4;
+    text-decoration: none;
+}
+
+.menu a:hover {
+    text-decoration: underline;
+}
+
+.menu-usuario {
+    margin-left: auto;
+    color: #666;
+    font-size: 14px;
+}
+
+.tabela-scroll {
+    overflow-x: auto;
+}
+
+.btn-pequeno {
+    margin-top: 0;
+    padding: 5px 10px;
+    font-size: 13px;
+}
+
+.btn-excluir {
+    background: #b00020;
+}
+
+.btn-excluir:hover {
+    background: #8c0019;
+}
+
+.vazio {
+    color: #666;
+    font-style: italic;
 }
 
 .erro {
