@@ -4,7 +4,6 @@ include 'verifica_login.php';
 $ambientes = $conn->query("SELECT * FROM ambientes ORDER BY andar, nome");
 $categorias = $conn->query("SELECT * FROM categorias_equipamento ORDER BY nome");
 $fabricantes = $conn->query("SELECT * FROM fabricantes ORDER BY nome");
-$tecnicos = $conn->query("SELECT * FROM tecnicos ORDER BY nome");
 ?>
 <!DOCTYPE html>
 <html lang="pt-br">
@@ -65,19 +64,7 @@ $tecnicos = $conn->query("SELECT * FROM tecnicos ORDER BY nome");
             </table>
         </div>
 
-        <h2>Técnicos</h2>
-        <div class="tabela-scroll">
-            <table>
-                <tr><th>Nome</th><th>Matrícula</th><th>Email</th></tr>
-                <?php while ($t = $tecnicos->fetch_assoc()): ?>
-                    <tr>
-                        <td><?php echo htmlspecialchars($t['nome']); ?></td>
-                        <td><?php echo htmlspecialchars($t['matricula']); ?></td>
-                        <td><?php echo htmlspecialchars($t['email']); ?></td>
-                    </tr>
-                <?php endwhile; ?>
-            </table>
-        </div>
+        <p>Os técnicos têm <a href="tecnicos.php">página própria</a>, com cadastro e edição.</p>
     </div>
 </body>
 </html>

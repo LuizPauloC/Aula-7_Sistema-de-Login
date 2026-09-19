@@ -131,8 +131,8 @@ Acesse `register.php` e cadastre-se normalmente.
 1. **Cadastro** (`register.php`) — nome, email e senha (mínimo 6 caracteres, com confirmação)
 2. **Login** (`login.php`) — abre a sessão e leva ao painel
 3. **Painel** (`painel.php`) — resumo da infraestrutura e, para creator/admin, gerenciamento de usuários
-4. **Racks, Equipamentos e Manutenções** — consulta para todos; cadastro, edição e exclusão para creator/admin
-5. **Cadastros** (`cadastros.php`) — consulta das tabelas de apoio (ambientes, categorias, fabricantes, técnicos)
+4. **Racks, Equipamentos, Manutenções e Técnicos** — consulta para todos; cadastro, edição e exclusão para creator/admin
+5. **Cadastros** (`cadastros.php`) — consulta das tabelas de apoio (ambientes, categorias e fabricantes)
 6. **Recuperar senha** (`recuperar_senha.php`) — informa o email e define a nova senha
 7. **Sair** (`logout.php`) — destrói a sessão
 
@@ -165,8 +165,9 @@ rebaixado, ele perde o acesso na hora, sem esperar o logout.
 ### Integridade referencial
 
 As chaves estrangeiras impedem apagar um registro que ainda tem dependentes. Ao tentar
-excluir um rack que possui equipamentos ou manutenções, o sistema mostra uma mensagem
-explicando o motivo em vez de quebrar.
+excluir um rack que possui equipamentos ou manutenções, ou um técnico que já aparece no
+histórico, o sistema mostra uma mensagem explicando o motivo em vez de quebrar. A
+matrícula do técnico é `UNIQUE`, então cadastrar uma repetida também é recusado com aviso.
 
 ---
 
@@ -203,6 +204,8 @@ aula7-login/
 ├── processa_equipamentos.php # Cadastra, edita e exclui equipamentos
 ├── manutencoes.php           # Lista e formulário de manutenções
 ├── processa_manutencoes.php  # Cadastra, edita e exclui manutenções
+├── tecnicos.php              # Lista e formulário de técnicos
+├── processa_tecnicos.php     # Cadastra, edita e exclui técnicos
 └── cadastros.php             # Consulta das tabelas de apoio
 ```
 
